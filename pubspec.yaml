@@ -1,0 +1,30 @@
+name: chronoclass
+description: organizador de atividades
+version: 1.0.0+1
+publish_to: "none"
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_fonts: ^6.0.0
+  sqflite: ^2.3.0
+  sqflite_common_ffi: ^2.3.2+1
+  path: ^1.8.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^3.0.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png
