@@ -5,6 +5,17 @@ class SchedulePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Tela de Horário das Aulas'));
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Horário das Aulas', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            const Text('Tabela de horários será implementada aqui'),
+          ],
+        ),
+      ),
+    );
   }
 }

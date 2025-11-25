@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'register_page.dart';
 import 'home_page.dart';
 import 'database_helper.dart';
 
@@ -16,6 +15,84 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   bool showPassword = false;
   String? errorMessage;
+
+  void _showRegisterDialog() {
+    String username = '';
+    String password = '';
+    String confirmPassword = '';
+    String role = 'student';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Cadastro'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    decoration: const InputDecoration(labelText: 'Usuário'),
+                    onChanged: (value) => username = value,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: 'Senha'),
+                    obscureText: true,
+                    onChanged: (value) => password = value,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: 'Confirmar Senha'),
+                    obscureText: true,
+                    onChanged: (value) => confirmPassword = value,
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: role,
+                    items: const [
+                      DropdownMenuItem(value: 'student', child: Text('Aluno')),
+                      DropdownMenuItem(value: 'monitor', child: Text('Monitor')),
+                    ],
+                    onChanged: (value) => setState(() => role = value!),
+                    decoration: const InputDecoration(labelText: 'Tipo de Usuário'),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (password != confirmPassword) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('As senhas não coincidem')),
+                      );
+                      return;
+                    }
+
+                    bool success = await DatabaseHelper.instance.register(username, password, role);
+                    if (success) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Usuário criado com sucesso!')),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Erro ao criar usuário')),
+                      );
+                    }
+                  },
+                  child: const Text('Cadastrar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,16 +154,14 @@ class _LoginPageState extends State<LoginPage> {
                     final user = usernameController.text.trim();
                     final pass = passwordController.text.trim();
 
-                    bool success =
-                        await DatabaseHelper.instance.login(user, pass);
-                    if (success) {
+                    final userData = await DatabaseHelper.instance.login(user, pass);
+                    if (userData != null) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const HomePage()),
+                        MaterialPageRoute(builder: (context) => HomePage(user: userData)),
                       );
                     } else {
-                      setState(
-                          () => errorMessage = 'Usuário ou senha incorretos');
+                      setState(() => errorMessage = 'Usuário ou senha incorretos');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -99,12 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.white)),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const RegisterPage()));
-                  },
+                  onPressed: _showRegisterDialog,
                   child: const Text('Não tem cadastro? Cadastre-se!'),
                 )
               ],

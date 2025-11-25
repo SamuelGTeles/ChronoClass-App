@@ -4,7 +4,7 @@ import 'login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DatabaseHelper.instance.initDatabase(); // inicializa o SQLite local
+  await DatabaseHelper.instance.initDatabase();
   runApp(const MyApp());
 }
 

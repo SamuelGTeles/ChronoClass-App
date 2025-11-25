@@ -6,7 +6,8 @@ import 'schedule_page.dart';
 import 'settings_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Map<String, dynamic> user;
+  const HomePage({super.key, required this.user});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -15,18 +16,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
 
-  final List<Widget> pages = const [
-    CalendarPage(),
-    SubjectsPage(),
-    PersonalTasksPage(),
-    SchedulePage(),
-    SettingsPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFF7A6592);
     const Color backgroundColor = Color(0xFFE9DEF0);
+
+    // Lista de páginas
+    final List<Widget> pages = [
+      CalendarPage(user: widget.user),
+      SubjectsPage(user: widget.user),
+      PersonalTasksPage(user: widget.user),
+      const SchedulePage(),
+      SettingsPage(user: widget.user),
+    ];
 
     return Scaffold(
       backgroundColor: backgroundColor,
