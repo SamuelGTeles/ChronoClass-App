@@ -8,26 +8,23 @@ class DatabaseHelper {
   static Database? _database;
 
   Future<Database> get database async {
-    _database ??= await initDatabase();
+    _database ??= await _initDatabase();
     return _database!;
   }
 
-  Future<Database> initDatabase() async {
+  Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'chrono_class.db');
 
-    final db = await openDatabase(
+    return await openDatabase(
       path,
       version: 1,
       onCreate: _onCreate,
     );
-
-    await _createAdminUser(db);
-    _database = db;
-    return db;
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    // Tabela de usuários
     await db.execute('''
       CREATE TABLE users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,6 +35,7 @@ class DatabaseHelper {
       )
     ''');
 
+    // Tabela de matérias
     await db.execute('''
       CREATE TABLE subjects(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +44,7 @@ class DatabaseHelper {
       )
     ''');
 
+    // Tabela de tarefas pessoais
     await db.execute('''
       CREATE TABLE personal_tasks(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,11 +56,20 @@ class DatabaseHelper {
       )
     ''');
 
-    // Inserir matérias padrão
-    await _insertDefaultSubjects(db);
+    // Inserir dados iniciais
+    await _insertDefaultData(db);
   }
 
-  Future<void> _insertDefaultSubjects(Database db) async {
+  Future<void> _insertDefaultData(Database db) async {
+    // Criar usuário admin
+    await db.insert('users', {
+      'username': 'admin',
+      'password': '1234',
+      'role': 'admin',
+      'class_team': 'Redes de Computadores II'
+    });
+
+    // Inserir matérias
     final subjects = [
       {'name': 'Alemão', 'teacher': 'Michele'},
       {'name': 'Educação Física', 'teacher': 'Alexandre'},
@@ -94,18 +102,7 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> _createAdminUser(Database db) async {
-    final result = await db.query('users', where: 'username = ?', whereArgs: ['admin']);
-    if (result.isEmpty) {
-      await db.insert('users', {
-        'username': 'admin',
-        'password': '1234',
-        'role': 'admin',
-        'class_team': 'Redes de Computadores II'
-      });
-    }
-  }
-
+  // ========== MÉTODOS DE USUÁRIO ==========
   Future<Map<String, dynamic>?> login(String username, String password) async {
     final db = await database;
     final result = await db.query(
@@ -131,11 +128,28 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getUsers() async {
+    final db = await database;
+    return await db.query('users', where: 'username != ?', whereArgs: ['admin']);
+  }
+
+  Future<int> updateUserRole(int userId, String newRole) async {
+    final db = await database;
+    return await db.update(
+      'users', 
+      {'role': newRole},
+      where: 'id = ?',
+      whereArgs: [userId]
+    );
+  }
+
+  // ========== MÉTODOS DE MATÉRIAS ==========
   Future<List<Map<String, dynamic>>> getSubjects() async {
     final db = await database;
     return await db.query('subjects');
   }
 
+  // ========== MÉTODOS DE TAREFAS PESSOAIS ==========
   Future<List<Map<String, dynamic>>> getPersonalTasks(int userId) async {
     final db = await database;
     return await db.query('personal_tasks', 
@@ -152,8 +166,18 @@ class DatabaseHelper {
 
   Future<int> updatePersonalTask(int taskId, bool completed) async {
     final db = await database;
-    return await db.update('personal_tasks', 
+    return await db.update(
+      'personal_tasks', 
       {'completed': completed ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [taskId]
+    );
+  }
+
+  Future<int> deletePersonalTask(int taskId) async {
+    final db = await database;
+    return await db.delete(
+      'personal_tasks',
       where: 'id = ?',
       whereArgs: [taskId]
     );

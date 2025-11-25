@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'home_page.dart';
 import 'database_helper.dart';
 
@@ -72,6 +71,13 @@ class _LoginPageState extends State<LoginPage> {
                       return;
                     }
 
+                    if (username.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Preencha todos os campos')),
+                      );
+                      return;
+                    }
+
                     bool success = await DatabaseHelper.instance.register(username, password, role);
                     if (success) {
                       Navigator.pop(context);
@@ -80,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Erro ao criar usuário')),
+                        const SnackBar(content: Text('Erro ao criar usuário. Tente outro nome.')),
                       );
                     }
                   },
@@ -96,11 +102,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF7A6592);
-    const Color backgroundColor = Color(0xFFE9DEF0);
-
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: const Color(0xFFE9DEF0),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
@@ -111,18 +114,20 @@ class _LoginPageState extends State<LoginPage> {
               borderRadius: BorderRadius.circular(24),
               boxShadow: const [
                 BoxShadow(
-                    blurRadius: 16,
-                    offset: Offset(6, 6),
-                    color: Color.fromRGBO(0, 0, 0, 0.05))
+                  blurRadius: 16,
+                  offset: Offset(6, 6),
+                  color: Color.fromRGBO(0, 0, 0, 0.05)
+                )
               ],
             ),
             child: Column(
               children: [
-                Icon(Icons.book, size: 80, color: primaryColor),
+                const Icon(Icons.book, size: 80, color: Color(0xFF7A6592)),
                 const SizedBox(height: 16),
-                Text('Bem-vindo ao Chrono Class!',
-                    style: GoogleFonts.poppins(
-                        fontSize: 22, fontWeight: FontWeight.w600)),
+                const Text(
+                  'Bem-vindo ao Chrono Class!',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 24),
                 TextField(
                   controller: usernameController,
@@ -135,24 +140,28 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: 'Senha',
                     suffixIcon: IconButton(
-                      icon: Icon(showPassword
-                          ? Icons.visibility
-                          : Icons.visibility_off),
-                      onPressed: () =>
-                          setState(() => showPassword = !showPassword),
+                      icon: Icon(showPassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => showPassword = !showPassword),
                     ),
                   ),
                 ),
                 if (errorMessage != null) ...[
                   const SizedBox(height: 8),
-                  Text(errorMessage!,
-                      style: const TextStyle(color: Colors.red)),
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () async {
                     final user = usernameController.text.trim();
                     final pass = passwordController.text.trim();
+
+                    if (user.isEmpty || pass.isEmpty) {
+                      setState(() => errorMessage = 'Preencha todos os campos');
+                      return;
+                    }
 
                     final userData = await DatabaseHelper.instance.login(user, pass);
                     if (userData != null) {
@@ -165,13 +174,14 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
+                    backgroundColor: const Color(0xFF7A6592),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text('Entrar',
-                      style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Entrar',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 TextButton(
                   onPressed: _showRegisterDialog,

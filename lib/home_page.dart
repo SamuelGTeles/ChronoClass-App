@@ -14,14 +14,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int currentIndex = 0;
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF7A6592);
-    const Color backgroundColor = Color(0xFFE9DEF0);
-
-    // Lista de páginas
     final List<Widget> pages = [
       CalendarPage(user: widget.user),
       SubjectsPage(user: widget.user),
@@ -31,26 +27,39 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: const Color(0xFFE9DEF0),
       appBar: AppBar(
         title: const Text('Chrono Class'),
-        backgroundColor: primaryColor,
+        backgroundColor: const Color(0xFF7A6592),
         foregroundColor: Colors.white,
       ),
-      body: pages[currentIndex],
+      body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        selectedItemColor: primaryColor,
+        currentIndex: _currentIndex,
+        selectedItemColor: const Color(0xFF7A6592),
         unselectedItemColor: Colors.grey,
-        onTap: (index) => setState(() => currentIndex = index),
+        onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: 'Calendário'),
-          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Matérias'),
+            icon: Icon(Icons.calendar_today),
+            label: 'Calendário',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.check_circle_outline), label: 'Tarefas'),
-          BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Aulas'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Config.'),
+            icon: Icon(Icons.school),
+            label: 'Matérias',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline),
+            label: 'Tarefas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.schedule),
+            label: 'Aulas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Config.',
+          ),
         ],
       ),
     );
